@@ -11,6 +11,7 @@ RUN curl https://bazel.build/bazel-release.pub.gpg | apt-key add -
 RUN apt-get update && apt-get install -y \
       bazel \
       build-essential \
+      cmake \
       gdb \
       git \
       libboost-all-dev \
@@ -26,3 +27,7 @@ COPY 3rdparty/3rdparty /3rdparty/
 # Install googletest
 COPY 3rdparty/googletest /devdocker/3rdparty/googletest/
 RUN /3rdparty/3rdparty mklib googletest --cleanup
+
+# Install gflags
+COPY 3rdparty/gflags /devdocker/3rdparty/gflags/
+RUN /3rdparty/3rdparty mklib gflags --cleanup
