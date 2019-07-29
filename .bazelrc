@@ -1,0 +1,4 @@
+build --copt='-Werror' \
+      --copt='-Wall' \
+      --copt='-Wextra' \
+      --verbose_failures
