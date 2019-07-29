@@ -1,0 +1,89 @@
+#! /usr/bin/python
+
+import argparse
+import os
+import shutil
+import stat
+import subprocess
+import sys
+import yaml
+
+def readLibConfig(library):
+  with open('devdocker/3rdparty/%s/config.yaml' % library) as yf:
+    return yaml.safe_load(yf)
+
+def libSrcDir(library):
+  return 'devdocker/3rdparty/%s/src-gitignore' % library
+
+def fetchLib(args, unknownArgs):
+  cfg = readLibConfig(args.library)
+  src = libSrcDir(cfg['name'])
+  # Fetch the source code for the library
+  shutil.rmtree(src, ignore_errors = True)
+  if 'custom' in cfg:
+    os.makedirs(src)
+    subprocess.check_call([cfg['custom']], cwd = src, shell = True)
+  else:
+    subprocess.check_call(['git', 'clone', cfg['git'], src])
+    subprocess.check_call(['git', 'checkout', cfg['commit']], cwd = src)
+
+def mkLib(args, unknownArgs):
+  cfg = readLibConfig(args.library)
+  fetchLib(args, unknownArgs)
+  env = os.environ.copy()
+  with open('/tmp/build-outer.sh', 'w') as buildOuter:
+    buildOuter.write("""
+set -e -o pipefail
+pushd devdocker/3rdparty/$EXTERNAL_LIB/src-gitignore > /dev/null
+source ../build.sh
+popd > /dev/null
+"""
+    )
+  # Define other build environment variables (CFLAGS etc) as needed.
+  env['EXTERNAL_LIB'] = cfg['name']
+  env['PARALLELISM'] = '10'
+  subprocess.check_call(['/bin/bash', '/tmp/build-outer.sh'], env=env)
+  if args.cleanup:
+    src = libSrcDir(cfg['name'])
+    shutil.rmtree(src, ignore_errors = True)
+
+def argParser():
+  parser = argparse.ArgumentParser(
+    prog = '3rdparty',
+    description = 'Utility for fetching and building 3rdparty libraries')
+  subparsers = parser.add_subparsers(
+    title = 'subcommands',
+    help = 'execute commands with -h for further help')
+
+  # fetchlib command
+  fetchlibP = subparsers.add_parser(
+    'fetchlib',
+    description = 'Fetches the source of the given 3rdparty library',
+    help = 'Fetches the source of the given 3rdparty library')
+  fetchlibP.add_argument(
+    'library', help = 'The name of the library')
+  fetchlibP.set_defaults(func = fetchLib)
+
+  # mklib command
+  mklibP = subparsers.add_parser(
+    'mklib',
+    description = 'Fetches and builds the source of the given 3rdparty library',
+    help = 'Fetches and builds the source of the given 3rdparty library')
+  mklibP.add_argument(
+    'library', help = 'The name of the library')
+  mklibP.add_argument(
+    '--cleanup', dest = 'cleanup', action = 'store_true',
+    help = 'Cleanup the source tree after building/installing the library')
+  mklibP.set_defaults(cleanup = False)
+  mklibP.set_defaults(func = mkLib)
+
+  return parser
+
+def main(argv):
+  parser = argParser()
+  args, unknownArgs = parser.parse_known_args()
+  args.func(args, unknownArgs)
+
+if __name__ == '__main__':
+  main(sys.argv)
+

@@ -1,0 +1,12 @@
+# This is a python code snippet that evaluates to a dictionary.
+# We use this dictionary to represent the devdocker config file.
+{
+  "registry": "registry.hub.docker.com",
+  "imageName": "priyendra/devdocker-dlox",
+  "imageVersion": "v1.0",
+  "containerName": "devdocker-dlox",
+  "dockerFile": "devdocker/Dockerfile",
+  "mount" : [
+    "%(HOMEDIR)s/.cache/bazel:/%(HOMEDIR)s/.cache/bazel:delegated"
+  ]
+}
