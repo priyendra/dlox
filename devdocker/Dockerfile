@@ -31,3 +31,7 @@ RUN /3rdparty/3rdparty mklib googletest --cleanup
 # Install gflags
 COPY 3rdparty/gflags /devdocker/3rdparty/gflags/
 RUN /3rdparty/3rdparty mklib gflags --cleanup
+
+# Install fmtlib
+COPY 3rdparty/fmtlib /devdocker/3rdparty/fmtlib/
+RUN /3rdparty/3rdparty mklib fmtlib --cleanup
