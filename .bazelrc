@@ -1,4 +1,5 @@
-build --copt='-Werror' \
+build --cxxopt='-std=c++17' \
+      --copt='-Werror' \
       --copt='-Wall' \
       --copt='-Wextra' \
       --verbose_failures
