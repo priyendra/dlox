@@ -502,6 +502,35 @@ TEST(Scanner, MultiLineProgram) {
   EXPECT_EQ(TokenType::END_OF_FILE, tokens[26].type());
 }
 
+TEST(Scanner, Rewind) {
+  {
+    const std::string src("hello { while != true");
+    ErrorReporter err(src);
+    Scanner s(&err, src.begin(), src.end());
+    auto tokenOne = s.next();
+    EXPECT_EQ(TokenType::IDENTIFIER, tokenOne.type());
+    EXPECT_EQ("hello", tokenOne.lexeme());
+    auto tokenTwo = s.next();
+    EXPECT_EQ(TokenType::LEFT_BRACE, tokenTwo.type());
+    EXPECT_EQ("{", tokenTwo.lexeme());
+    s.rewind();
+    auto tokenThree = s.next();
+    EXPECT_EQ(TokenType::LEFT_BRACE, tokenThree.type());
+    EXPECT_EQ("{", tokenThree.lexeme());
+    auto tokenFour = s.next();
+    EXPECT_EQ(TokenType::WHILE, tokenFour.type());
+    EXPECT_EQ("while", tokenFour.lexeme());
+    auto tokenFive = s.next();
+    EXPECT_EQ(TokenType::BANG_EQUAL, tokenFive.type());
+    EXPECT_EQ("!=", tokenFive.lexeme());
+    auto tokenSix = s.next();
+    EXPECT_EQ(TokenType::TRUE, tokenSix.type());
+    EXPECT_EQ("true", tokenSix.lexeme());
+    auto tokenSeven = s.next();
+    EXPECT_EQ(TokenType::END_OF_FILE, tokenSeven.type());
+  }
+}
+
 }  // namespace lox
 
 int main(int argc, char** argv) {

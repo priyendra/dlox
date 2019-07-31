@@ -19,11 +19,16 @@ namespace lox {
 template <typename Iterator> class Scanner {
  public:
   Scanner(ErrorReporter* err, Iterator begin, Iterator end)
-    : err_(err), b_(begin), e_(end), i_(begin) {}
+    : err_(err), b_(begin), e_(end), i_(begin), prev_(begin) {}
   // Returns the next token from the program. The last token will always be
-  // of type TokenType::END_OF_FILE. It is illegal to call next() after it
-  // has once returned EOF.
+  // of type TokenType::END_OF_FILE. Repeated calls to next() after it has
+  // once returned EOF will repeatedly return EOF.
   Token next();
+  // Allows the scanner to rewind back one token in the stream. This method
+  // cannot be called twice. That is, we only support rewinding back one step.
+  void rewind() { i_ = prev_; }
+  bool done() const { return i_ == e_; }
+  int currLocation() const { return i_ - b_; }
 
  private:
   Token scanIdentifier();
@@ -34,9 +39,11 @@ template <typename Iterator> class Scanner {
   Iterator b_;
   Iterator e_;
   Iterator i_;
+  Iterator prev_;
 };
 
 template <typename Iterator> Token Scanner<Iterator>::next() {
+  prev_ = i_;
   while (i_ != e_) {
     auto c = *i_;
     if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_') {
