@@ -1,8 +1,9 @@
 cc_binary(
   name = 'lox',
   srcs = [ 'main.cpp' ],
-  deps = [ ':error-reporter',
-           ':scanner',
+  deps = [ ':ast-printer',
+           ':error-reporter',
+           ':parser',
            ':token',
            ':token-type',
            '@external//:gflags' ])

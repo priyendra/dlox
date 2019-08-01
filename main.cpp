@@ -3,8 +3,9 @@
 #include <string>
 #include <gflags/gflags.h>
 
+#include "ast-printer.hpp"
 #include "error-reporter.hpp"
-#include "scanner.hpp"
+#include "parser.hpp"
 #include "token.hpp"
 
 namespace lox {
@@ -50,11 +51,16 @@ class LoxEngine {
  private:
   bool run(const std::string& src) {
     ErrorReporter err(src);
-    Scanner scan(&err, src.begin(), src.end());
-    while (true) {
-      auto token = scan.next();
-      if (token.type() == TokenType::END_OF_FILE) break;
-      std::cout << token.debugString() << std::endl;
+    Parser parser(&err, src.begin(), src.end());
+    auto parsed = parser.parse();
+    if (err.hasErrors()) {
+      for (int i = 0; i < err.numErrors(); ++i) {
+        std::cout << "Error: location=" << err.error(i).location
+                  << ", msg=" << err.error(i).msg << std::endl;
+      }
+    } else {
+      std::cout << "AST: " << ast::Printer::print(parsed.get(), true)
+                << std::endl;
     }
     return true;
   }
