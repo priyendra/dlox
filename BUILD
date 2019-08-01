@@ -8,8 +8,25 @@ cc_binary(
            '@external//:gflags' ])
 
 cc_library(
+  name = 'ast',
+  hdrs = [ 'ast.hpp' ])
+
+cc_library(
+  name = 'ast-printer',
+  hdrs = [ 'ast-printer.hpp' ])
+
+cc_library(
   name = 'error-reporter',
   hdrs = [ 'error-reporter.hpp' ])
+
+cc_library(
+  name = 'parser',
+  hdrs = [ 'parser.hpp' ],
+  deps = [ ':ast',
+           ':error-reporter',
+           ':scanner',
+           ':token',
+           ':token-type' ])
 
 cc_library(
   name = 'scanner',
@@ -29,6 +46,14 @@ cc_library(
   hdrs = [ 'token.hpp' ],
   deps = [ ':token-type',
            '@external//:fmtlib' ])
+
+cc_test(
+  name = 'parser-test',
+  srcs = [ 'parser-test.cpp' ],
+  deps = [ ':ast-printer',
+           ':error-reporter',
+           ':parser',
+           '@external//:googletest' ])
 
 cc_test(
   name = 'scanner-test',
