@@ -3,6 +3,7 @@
 #include <string>
 #include <gflags/gflags.h>
 
+#include "ast-eval.hpp"
 #include "ast-printer.hpp"
 #include "error-reporter.hpp"
 #include "parser.hpp"
@@ -59,8 +60,32 @@ class LoxEngine {
                   << ", msg=" << err.error(i).msg << std::endl;
       }
     } else {
-      std::cout << "AST: " << ast::Printer::print(parsed.get(), true)
-                << std::endl;
+      ast::Value value;
+      ast::Evaluator::Status status =
+          ast::Evaluator::eval(parsed.get(), &value);
+      if (status.ok) {
+        switch (value.type()) {
+          case ast::ValueType::NIL:
+            std::cout << "nil\n";
+            break;
+          case ast::ValueType::BOOL:
+            std::cout << (value.b() ? "true\n" : "false\n");
+            break;
+          case ast::ValueType::NUMBER:
+            std::cout << value.d() << std::endl;
+            break;
+          case ast::ValueType::STRING:
+            std::cout << value.s() << std::endl;
+            break;
+          default:
+            std::cout << "Unexpected type: " << static_cast<int>(value.type())
+                      << "\n";
+            break;
+        }
+      } else {
+        std::cout << "Runtime error: msg=" << status.message
+                  << ", location: " << status.token.location() << "\n";
+      }
     }
     return true;
   }

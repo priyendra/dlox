@@ -96,12 +96,6 @@ class Printer {
         case Binary::LESS_EQUAL:
           op = "<=";
           break;
-        case Binary::AND:
-          op = "AND";
-          break;
-        case Binary::OR:
-          op = "OR";
-          break;
       }
       std::stringstream ss;
       if (not multiLine_ || (first->terminal && second->terminal)) {

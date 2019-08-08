@@ -10,6 +10,7 @@ namespace lox {
 // scanner class. Tokens consist of type, lexeme and location.
 class Token {
 public:
+  Token() = default;
   Token(TokenType type, std::string lexeme, int location)
       : type_(type), lexeme_(lexeme), location_(location) {}
   std::string debugString() {

@@ -1,7 +1,8 @@
 cc_binary(
   name = 'lox',
   srcs = [ 'main.cpp' ],
-  deps = [ ':ast-printer',
+  deps = [ ':ast-eval',
+           ':ast-printer',
            ':error-reporter',
            ':parser',
            ':token',
@@ -10,11 +11,19 @@ cc_binary(
 
 cc_library(
   name = 'ast',
-  hdrs = [ 'ast.hpp' ])
+  hdrs = [ 'ast.hpp' ],
+  deps = [ ':token' ])
+
+cc_library(
+  name = 'ast-eval',
+  hdrs = [ 'ast-eval.hpp' ],
+  deps = [ ':ast',
+           ':token' ])
 
 cc_library(
   name = 'ast-printer',
-  hdrs = [ 'ast-printer.hpp' ])
+  hdrs = [ 'ast-printer.hpp' ],
+  deps = [ ':ast' ])
 
 cc_library(
   name = 'error-reporter',
@@ -51,7 +60,8 @@ cc_library(
 cc_test(
   name = 'parser-test',
   srcs = [ 'parser-test.cpp' ],
-  deps = [ ':ast-printer',
+  deps = [ ':ast-eval',
+           ':ast-printer',
            ':error-reporter',
            ':parser',
            '@external//:googletest' ])

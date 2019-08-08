@@ -2,6 +2,7 @@
 
 #include <any>
 #include <memory>
+#include "token.hpp"
 
 namespace lox {
 namespace ast {
@@ -36,6 +37,7 @@ struct Unary : public Node {
   enum Operator { MINUS, BANG };
   std::any accept(Visitor* visitor) const override;
   Operator op;
+  Token opToken;
   // TODO: If Node is generic AstNode, then this should be Expr. We have not
   // defined a separate Expr class yet because our current goal is to only
   // parse expressions. So expressions are actually the highest point in our
@@ -54,12 +56,11 @@ struct Binary : public Node {
     GREATER,
     GREATER_EQUAL,
     LESS,
-    LESS_EQUAL,
-    AND,
-    OR
+    LESS_EQUAL
   };
   std::any accept(Visitor* visitor) const override;
   Operator op;
+  Token opToken;
   std::unique_ptr<Node> first;
   std::unique_ptr<Node> second;
 };

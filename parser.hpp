@@ -51,9 +51,11 @@ template <typename Iterator> class Parser {
       switch (token.type()) {
         case TokenType::BANG_EQUAL:
           binary->op = ast::Binary::BANG_EQUAL;
+          binary->opToken = token;
           break;
         case TokenType::EQUAL_EQUAL:
           binary->op = ast::Binary::EQUAL_EQUAL;
+          binary->opToken = token;
           break;
         default:
           s_.rewind();
@@ -74,15 +76,19 @@ template <typename Iterator> class Parser {
       switch (token.type()) {
         case TokenType::GREATER:
           binary->op = ast::Binary::GREATER;
+          binary->opToken = token;
           break;
         case TokenType::GREATER_EQUAL:
           binary->op = ast::Binary::GREATER_EQUAL;
+          binary->opToken = token;
           break;
         case TokenType::LESS:
           binary->op = ast::Binary::LESS;
+          binary->opToken = token;
           break;
         case TokenType::LESS_EQUAL:
           binary->op = ast::Binary::LESS_EQUAL;
+          binary->opToken = token;
           break;
         default:
           s_.rewind();
@@ -103,9 +109,11 @@ template <typename Iterator> class Parser {
       switch (token.type()) {
         case TokenType::MINUS:
           binary->op = ast::Binary::MINUS;
+          binary->opToken = token;
           break;
         case TokenType::PLUS:
           binary->op = ast::Binary::PLUS;
+          binary->opToken = token;
           break;
         default:
           s_.rewind();
@@ -126,9 +134,11 @@ template <typename Iterator> class Parser {
       switch (token.type()) {
         case TokenType::SLASH:
           binary->op = ast::Binary::SLASH;
+          binary->opToken = token;
           break;
         case TokenType::STAR:
           binary->op = ast::Binary::STAR;
+          binary->opToken = token;
           break;
         default:
           s_.rewind();
@@ -146,6 +156,7 @@ template <typename Iterator> class Parser {
       auto unary = std::make_unique<ast::Unary>();
       unary->op = token.type() == TokenType::BANG ? ast::Unary::BANG :
                                                     ast::Unary::MINUS;
+      unary->opToken = token;
       unary->operand = parseUnary();
       return unary;
     }
